@@ -1,0 +1,85 @@
+{
+  "name": "@cqlinkoff/eth-utils",
+  "version": "1.0.0",
+  "description": "utils for ETH wallet",
+  "main": "lib/index.js",
+  "module": "es/index.js",
+  "scripts": {
+    "pretest": "npm run lint",
+    "test": "exit 0",
+    "lint": "npm run lint:js",
+    "lint:js": "eslint ./src/**",
+    "prebuild": "npm run test",
+    "build": "npm run build:es && npm run build:commonjs && npm run build:umd",
+    "build:commonjs": "BABEL_ENV=commonjs babel src -d lib",
+    "build:es": "BABEL_ENV=es babel src -d es",
+    "build:umd": "webpack",
+    "prepare": "npm run build",
+    "preversion": "npm run build",
+    "coverage": "cat ./coverage/lcov.info | coveralls"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cqlinkoff/eth-utils.git"
+  },
+  "keywords": [
+    "eth",
+    "utils",
+    "sign",
+    "personalSign",
+    "wallet",
+    "blockchain"
+  ],
+  "files": [
+    "es",
+    "lib",
+    "dist"
+  ],
+  "author": "kagawagao <kingsongao1221@gmail.com> (https://kingsongao.com/)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cqlinkoff/eth-utils/issues"
+  },
+  "homepage": "https://github.com/cqlinkoff/eth-utils#readme",
+  "dependencies": {
+    "@cqlinkoff/wk-bridge": "^1.1.2",
+    "ethereumjs-util": "^6.1.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.4.4",
+    "@babel/core": "^7.4.4",
+    "@babel/plugin-proposal-class-properties": "^7.4.4",
+    "@babel/preset-env": "^7.4.4",
+    "@babel/runtime": "^7.4.4",
+    "babel-eslint": "^10.0.1",
+    "babel-jest": "^24.8.0",
+    "babel-loader": "^8.0.5",
+    "eslint": "^5.16.0",
+    "eslint-config-prettier": "^5.0.0",
+    "eslint-config-standard": "^12.0.0",
+    "eslint-plugin-import": "^2.17.2",
+    "eslint-plugin-node": "^8.0.1",
+    "eslint-plugin-prettier": "^3.1.0",
+    "eslint-plugin-promise": "^4.1.1",
+    "eslint-plugin-standard": "^4.0.0",
+    "husky": "^2.4.1",
+    "jest": "^24.8.0",
+    "lint-staged": "^8.2.1",
+    "prettier": "^1.18.2",
+    "terser-webpack-plugin": "^1.2.3",
+    "webpack": "^4.30.0",
+    "webpack-cli": "^3.3.2",
+    "webpackbar": "^3.2.0"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.js": [
+      "eslint --fix",
+      "git add"
+    ]
+  }
+}
