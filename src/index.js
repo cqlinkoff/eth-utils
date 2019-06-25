@@ -43,10 +43,10 @@ export const recoverPublicKey = (hash, sig) => {
   return ecrecover(hash, sigParams.v, sigParams.r, sigParams.s)
 }
 
-export const getPublicKeyFor = msgParams => {
-  const message = toBuffer(msgParams.data)
+export const getPublicKeyFor = ({ data, sig }) => {
+  const message = toBuffer(data)
   const msgHash = hashPersonalMessage(message)
-  return recoverPublicKey(msgHash, msgParams.sig)
+  return recoverPublicKey(msgHash, sig)
 }
 
 export const personalSign = (privateKey, msg) => {
@@ -54,17 +54,17 @@ export const personalSign = (privateKey, msg) => {
   const msgHash = hashPersonalMessage(message)
   const sig = ecsign(msgHash, Buffer.from(privateKey, 'hex'))
   const serialized = bufferToHex(concatSig(sig.v, sig.r, sig.s))
-  if (typeof bridge.postMessage === 'function') {
-    bridge.postMessage('setPersonalSignResult', serialized)
-  }
+  bridge.postMessage('setPersonalSignResult', serialized)
   return serialized
 }
 
-export const recoverPersonalSignature = msgParams => {
-  const publicKey = getPublicKeyFor(msgParams)
+export const recoverPersonalSignature = (data, sig) => {
+  const publicKey = getPublicKeyFor({ data, sig })
   const sender = publicToAddress(publicKey)
   const senderHex = bufferToHex(sender)
+  bridge.postMessage('setRecoverPersonalSignatureResult', senderHex)
   return senderHex
 }
 
 window.personalSign = personalSign
+window.recoverPersonalSignature = recoverPersonalSignature
