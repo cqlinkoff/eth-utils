@@ -2,6 +2,7 @@ const path = require('path')
 // const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
 const TerserPlugin = require('terser-webpack-plugin')
 const WebpackBar = require('webpackbar')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 module.exports = {
   mode: 'production',
@@ -30,7 +31,10 @@ module.exports = {
   },
   plugins: [
     // new BundleAnalyzerPlugin(),
-    new WebpackBar()
+    new WebpackBar(),
+    new HtmlWebpackPlugin({
+      minify: false
+    })
   ],
   optimization: {
     minimizer: [

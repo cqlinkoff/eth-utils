@@ -1,5 +1,19 @@
 import WKBridge from '@cqlinkoff/wk-bridge'
-import ethUtil from 'ethereumjs-util'
+import {
+  fromSigned,
+  bufferToInt,
+  toUnsigned,
+  stripHexPrefix,
+  intToHex,
+  addHexPrefix,
+  toBuffer,
+  fromRpcSig,
+  ecrecover,
+  hashPersonalMessage,
+  ecsign,
+  bufferToHex,
+  publicToAddress
+} from 'ethereumjs-util'
 
 const bridge = new WKBridge({
   namespace: 'ethUtils'
@@ -14,40 +28,40 @@ export const padWithZeroes = (number, length) => {
 }
 
 export const concatSig = (v, r, s) => {
-  const rSig = ethUtil.fromSigned(r)
-  const sSig = ethUtil.fromSigned(s)
-  const vSig = ethUtil.bufferToInt(v)
-  const rStr = padWithZeroes(ethUtil.toUnsigned(rSig).toString('hex'), 64)
-  const sStr = padWithZeroes(ethUtil.toUnsigned(sSig).toString('hex'), 64)
-  const vStr = ethUtil.stripHexPrefix(ethUtil.intToHex(vSig))
-  return ethUtil.addHexPrefix(rStr.concat(sStr, vStr)).toString('hex')
+  const rSig = fromSigned(r)
+  const sSig = fromSigned(s)
+  const vSig = bufferToInt(v)
+  const rStr = padWithZeroes(toUnsigned(rSig).toString('hex'), 64)
+  const sStr = padWithZeroes(toUnsigned(sSig).toString('hex'), 64)
+  const vStr = stripHexPrefix(intToHex(vSig))
+  return addHexPrefix(rStr.concat(sStr, vStr)).toString('hex')
 }
 
 export const recoverPublicKey = (hash, sig) => {
-  const signature = ethUtil.toBuffer(sig)
-  const sigParams = ethUtil.fromRpcSig(signature)
-  return ethUtil.ecrecover(hash, sigParams.v, sigParams.r, sigParams.s)
+  const signature = toBuffer(sig)
+  const sigParams = fromRpcSig(signature)
+  return ecrecover(hash, sigParams.v, sigParams.r, sigParams.s)
 }
 
 export const getPublicKeyFor = msgParams => {
-  const message = ethUtil.toBuffer(msgParams.data)
-  const msgHash = ethUtil.hashPersonalMessage(message)
+  const message = toBuffer(msgParams.data)
+  const msgHash = hashPersonalMessage(message)
   return recoverPublicKey(msgHash, msgParams.sig)
 }
 
 export const personalSign = (privateKey, msg) => {
-  const message = ethUtil.toBuffer(msg)
-  const msgHash = ethUtil.hashPersonalMessage(message)
-  const sig = ethUtil.ecsign(msgHash, privateKey)
-  const serialized = ethUtil.bufferToHex(concatSig(sig.v, sig.r, sig.s))
+  const message = toBuffer(msg)
+  const msgHash = hashPersonalMessage(message)
+  const sig = ecsign(msgHash, Buffer.from(privateKey, 'hex'))
+  const serialized = bufferToHex(concatSig(sig.v, sig.r, sig.s))
   bridge.postMessage('setPersonalSignResult', serialized)
   return serialized
 }
 
 export const recoverPersonalSignature = msgParams => {
   const publicKey = getPublicKeyFor(msgParams)
-  const sender = ethUtil.publicToAddress(publicKey)
-  const senderHex = ethUtil.bufferToHex(sender)
+  const sender = publicToAddress(publicKey)
+  const senderHex = bufferToHex(sender)
   return senderHex
 }
 
