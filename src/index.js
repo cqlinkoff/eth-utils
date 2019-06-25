@@ -54,7 +54,9 @@ export const personalSign = (privateKey, msg) => {
   const msgHash = hashPersonalMessage(message)
   const sig = ecsign(msgHash, Buffer.from(privateKey, 'hex'))
   const serialized = bufferToHex(concatSig(sig.v, sig.r, sig.s))
-  bridge.postMessage('setPersonalSignResult', serialized)
+  if (typeof bridge.postMessage === 'function') {
+    bridge.postMessage('setPersonalSignResult', serialized)
+  }
   return serialized
 }
 
