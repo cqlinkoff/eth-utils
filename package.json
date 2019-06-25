@@ -1,6 +1,6 @@
 {
   "name": "@cqlinkoff/eth-utils",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "utils for native ETH wallet",
   "main": "lib/index.js",
   "module": "es/index.js",
